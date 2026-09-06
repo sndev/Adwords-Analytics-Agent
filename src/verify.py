@@ -48,7 +48,10 @@ def check_crm() -> str:
         return "SKIPPED (SN_API_KEY not set)"
     try:
         ok = crm.verify()
-        return "OK" if ok else "FAILED (unexpected response)"
+        if not ok:
+            return "FAILED (Ping returned non-200)"
+        sample = crm.contacts(limit=1)
+        return f"OK (connected; sample contact count: {len(sample)})"
     except Exception as e:  # noqa: BLE001
         return f"FAILED ({e})"
 

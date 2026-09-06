@@ -9,7 +9,7 @@ import requests
 
 from ..config_loader import optional_env, require_env
 
-DEFAULT_BASE = "https://api.salesnexus.com/api"
+DEFAULT_BASE = "https://api-beta.salesnex.us"
 
 
 def api_key() -> str:
@@ -22,7 +22,7 @@ def base_url() -> str:
 
 def _headers() -> Dict[str, str]:
     return {
-        "Authorization": f"Bearer {api_key()}",
+        "X-Api-Key": api_key(),
         "Content-Type": "application/json",
         "Accept": "application/json",
     }
@@ -35,10 +35,15 @@ def get(path: str, params: Dict[str, Any] | None = None) -> Any:
 
 
 def verify() -> bool:
-    """Probe the CRM with a lightweight endpoint to confirm connectivity."""
-    # Exact endpoint depends on the deployed CRM API; adjust to a known one.
-    r = requests.get(f"{base_url()}/contacts", headers=_headers(), timeout=30)
-    return r.status_code in (200, 401, 403)
+    """Ping the CRM to confirm connectivity and valid API key."""
+    r = requests.get(f"{base_url()}/api/v1/Ping", headers=_headers(), timeout=15)
+    return r.status_code == 200
+
+
+def contacts(limit: int = 5) -> List[Dict[str, Any]]:
+    """Fetch a small sample of contacts (for verification / diagnostics)."""
+    data = get("/api/v1/Contacts", {"page": 1, "pageSize": limit})
+    return data.get("items") or data.get("contacts") or data if isinstance(data, list) else []
 
 
 def recent_demo_bookings(days: int = 30) -> List[Dict[str, Any]]:
@@ -47,5 +52,4 @@ def recent_demo_bookings(days: int = 30) -> List[Dict[str, Any]]:
     NOTE: field names depend on the CRM API schema — confirm the source/campaign
     tag fields (e.g., UTM parameters / 'Google Ads' campaign) before relying on this.
     """
-    # Placeholder mapping; refine once the CRM schema is confirmed.
-    return get("/opportunities", {"days": days}) if False else []
+    return get("/api/v1/Opportunities", {"days": days}) if False else []

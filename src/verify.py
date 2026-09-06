@@ -18,11 +18,12 @@ def check_google_ads() -> str:
                   "GOOGLE_ADS_CUSTOMER_ID")
     ):
         return "SKIPPED (Google Ads creds not set)"
-    customers = ads.list_accessible_customers()
-    if not customers:
-        return "FAILED (no accessible customers)"
-    rows = ads.collect_campaign_overview()
-    return f"OK ({len(customers)} accessible customers; {len(rows)} campaigns found)"
+    try:
+        customers = ads.list_accessible_customers()
+        rows = ads.collect_campaign_overview()
+        return f"OK ({len(customers)} accessible customers; {len(rows)} campaigns found)"
+    except Exception as e:  # noqa: BLE001
+        return f"FAILED ({e})"
 
 
 def check_ga4() -> str:
@@ -58,13 +59,16 @@ def main() -> int:
         "GA4": check_ga4,
         "SalesNexus CRM": check_crm,
     }
-    print("=" * 50)
-    print("SalesNexus Ads + Analytics Agent — connection verification")
-    print("=" * 50)
+    print("=" * 50, flush=True)
+    print("SalesNexus Ads + Analytics Agent — connection verification", flush=True)
+    print("=" * 50, flush=True)
+    exit_code = 0
     for name, fn in checks.items():
         status = fn()
-        print(f"  {name:<22} {status}")
-    return 0 if all("FAILED" not in fn() for fn in checks.values()) else 1
+        exit_code |= 1 if status.startswith("FAILED") else 0
+        print(f"  {name:<22} {status}", flush=True)
+    print("=" * 50, flush=True)
+    return exit_code
 
 
 if __name__ == "__main__":

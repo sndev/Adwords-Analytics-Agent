@@ -43,7 +43,7 @@ def verify() -> bool:
 def contacts(limit: int = 5) -> List[Dict[str, Any]]:
     """Fetch a small sample of contacts (for verification / diagnostics)."""
     data = get("/api/v1/Contacts", {"page": 1, "pageSize": limit})
-    return data.get("items") or data.get("contacts") or data if isinstance(data, list) else []
+    return data if isinstance(data, list) else []
 
 
 def recent_demo_bookings(days: int = 30) -> List[Dict[str, Any]]:

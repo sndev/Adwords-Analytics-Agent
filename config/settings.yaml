@@ -1,0 +1,47 @@
+# Agent guardrails — these are HARD CAPS enforced by the rule layer.
+# Any proposed change exceeding a cap is escalated to Slack, never auto-applied.
+
+# --- Write policy ---
+write_policy: auto_apply_within_guardrails
+
+# --- Budget / bid caps (auto-apply cannot exceed these) ---
+caps:
+  max_max_cpc: 6.00        # per-keyword max CPC ceiling ($)
+  max_daily_budget: 20.00  # per-campaign daily budget ceiling ($)
+  max_budget_increase_per_run: 0.10   # +10% max single-step budget change
+  max_cpc_increase_per_run: 0.10      # +10% max single-step CPC change
+  min_daily_budget: 5.00
+
+# --- Conversion thresholds before signals may move spend/bids ---
+signals:
+  conversions_required_before_smart_bidding: 30   # switch to Target CPA / max conv after this many demo conversions
+  min_demo_conversions_before_bid_tuning: 5
+  min_impressions_before_negative_suggestion: 100
+
+# --- Negative-keyword automation ---
+negatives:
+  auto_add: true            # auto-add search terms flagged < exact-match + low intent
+  min_queries_to_auto_add: 3
+  review_overrides: true    # always escalate + set a manual-hold list
+
+# --- LLM tiering & cost caps ---
+llm:
+  etl_model: none           # deterministic code, $0
+  cheap_model: "gemini-flash"   # keywords, summaries
+  mid_model: "gemini-flash"     # RSA generation
+  strong_model: "gemini-pro"    # optimization decisions (rare)
+  per_run_cost_cap_usd: 0.05
+  monthly_cost_cap_usd: 1.00
+
+# --- Reporting ---
+reporting:
+  channel: slack
+  slack_webhook_url_env: SLACK_WEBHOOK_URL
+  daily_digest: true
+  weekly_summary: true
+  alerts:
+    - approval_failed
+    - budget_exhausted
+    - spend_spike
+    - guardrail_breach
+    - conversion_watch

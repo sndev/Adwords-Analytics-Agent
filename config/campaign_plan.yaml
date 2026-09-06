@@ -1,0 +1,38 @@
+# Managed campaign definitions.
+# Architecture supports multiple campaigns / future paid media; Intent Leads is first.
+
+# Default guardrails applied to all campaigns unless overridden (see settings.yaml)
+defaults:
+  networks_search_partners: false
+  networks_display: false
+  final_url_expansion: false
+  auto_created_assets: false
+  location_presence_only: true
+  budget: 20.00
+  match_types_launch: [exact]
+
+campaigns:
+  - name: "SalesNexus - Intent Leads (Search Only)"
+    type: search
+    budget: 20.00
+    geo: [US]
+    languages: [en]
+    schedule: "Mon-Fri 07:00-19:00 ET"
+    bidding:
+      strategy: manual_cpc
+      caps: {core: 5.00, alternative: 6.00}
+    conversion: "Demo Request Submitted"
+    ad_groups:
+      - name: "Intent Leads - Core"
+        final_url: "https://salesnexus.com/intent-leads/"
+        keywords: [
+          "[intent leads]", "[b2b intent leads]",
+          "[buyer intent leads]", "[in market leads]"
+        ]
+      - name: "ZoomInfo Alternative"
+        final_url: "https://salesnexus.com/instantly-vs-zoominfo-b2b-intent-data-comparison-lead-engine/"
+        keywords: ["[replace zoominfo]", "[zoominfo alternative]"]
+      - name: "Apollo Alternative"
+        final_url: "https://salesnexus.com/intent-leads/"
+        keywords: ["[replace apollo]", "[apollo alternative]"]
+    phase2_keywords: []   # populated from keywords_*_phase2 when budget increases

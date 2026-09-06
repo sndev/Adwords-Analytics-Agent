@@ -1,0 +1,52 @@
+name: Weekly Analysis
+
+on:
+  schedule:
+    - cron: "30 13 * * 1"   # Monday 08:30 ET
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  weekly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GOOGLE_ADS_DEVELOPER_TOKEN: ${{ secrets.GOOGLE_ADS_DEVELOPER_TOKEN }}
+      GOOGLE_ADS_CLIENT_ID: ${{ secrets.GOOGLE_ADS_CLIENT_ID }}
+      GOOGLE_ADS_CLIENT_SECRET: ${{ secrets.GOOGLE_ADS_CLIENT_SECRET }}
+      GOOGLE_ADS_REFRESH_TOKEN: ${{ secrets.GOOGLE_ADS_REFRESH_TOKEN }}
+      GOOGLE_ADS_CUSTOMER_ID: ${{ secrets.GOOGLE_ADS_CUSTOMER_ID }}
+      GOOGLE_ADS_LOGIN_CUSTOMER_ID: ${{ secrets.GOOGLE_ADS_LOGIN_CUSTOMER_ID }}
+      GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+      GOOGLE_APPLICATION_CREDENTIALS: /tmp/ga4-sa.json
+      SN_API_KEY: ${{ secrets.SN_API_KEY }}
+      SN_API_BASE_URL: ${{ secrets.SN_API_BASE_URL }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Load GA4 service account
+        if: env.GA4_SERVICE_ACCOUNT_JSON != ''
+        run: echo "$GA4_SERVICE_ACCOUNT_JSON" > /tmp/ga4-sa.json
+        env:
+          GA4_SERVICE_ACCOUNT_JSON: ${{ secrets.GA4_SERVICE_ACCOUNT_JSON }}
+
+      - name: Run weekly analysis
+        run: python -m src.main --mode weekly
+
+      - name: Commit report
+        run: |
+          git config user.name "salesnexus-ads-agent"
+          git config user.email "agent@salesnexus.com"
+          git add reports/ data/
+          git diff --cached --quiet || git commit -m "Weekly cross-source analysis report"
+          git push

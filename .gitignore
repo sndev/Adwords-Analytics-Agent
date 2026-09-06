@@ -1,0 +1,30 @@
+# Secrets & credentials — never commit
+.env
+*.env
+!*.env.example
+google-ads.yaml
+*service_account*.json
+*client_secret*.json
+credentials*.json
+**/*.key
+
+# Local data / state
+data/*.db
+data/*.sqlite*
+data/snapshots/
+data/cache/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/
+build/
+
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/

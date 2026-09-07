@@ -1,0 +1,1 @@
+📈 *Weekly cross-source analysis* — connectors verified; producing baseline report.

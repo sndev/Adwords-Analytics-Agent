@@ -8,9 +8,9 @@
 	debug_error_string = "PERMISSION_DENIED:The caller does not have permission"
 >, errors {
   error_code {
-    authorization_error: DEVELOPER_TOKEN_NOT_APPROVED
+    authorization_error: CLOUD_PROJECT_NOT_APPROVED_FOR_PRODUCTION
   }
-  message: "The developer token is only approved for use with test accounts. To access non-test accounts, apply for Basic or Standard access."
+  message: "The Google Cloud project is only approved for use with test accounts. To access non-test accounts, apply for Explorer, Basic or Standard access."
 }
-request_id: "t0aLxqg59KKrT0tFFa_6vA"
-, 't0aLxqg59KKrT0tFFa_6vA')
+request_id: "4kXAuiQNQ9IL9ck7vCz_OA"
+, '4kXAuiQNQ9IL9ck7vCz_OA')
